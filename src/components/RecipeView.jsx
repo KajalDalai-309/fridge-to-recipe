@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import IngredientList from "./IngredientList";
 import StepList from "./StepList";
 
@@ -17,6 +17,7 @@ export default function RecipeView({ recipe, onReset }) {
   return (
     <article className="recipe-card" aria-label={`Recipe: ${recipe.name}`}>
       <div className="recipe-header">
+        <span className="recipe-ai-label" aria-hidden="true">AI RECIPE</span>
         <h2 className="recipe-name">{recipe.name}</h2>
         <p className="recipe-desc">{recipe.description}</p>
 

@@ -8,7 +8,7 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3001;
 
-// Single endpoint — handles both recipe generation and ingredient swap
+// Single endpoint - handles both recipe generation and ingredient swap
 app.post("/api/generate", async (req, res) => {
   const { type, input, context } = req.body;
 
@@ -52,6 +52,10 @@ app.post("/api/generate", async (req, res) => {
     if (!response.ok) {
       const errorBody = await response.text();
       console.error("Groq API error:", response.status, errorBody);
+      // Pass rate-limit signal to frontend for a specific user-facing message
+      if (response.status === 429) {
+        return res.status(429).json({ error: "rate-limit" });
+      }
       return res.status(502).json({ error: "LLM provider error. Please try again." });
     }
 

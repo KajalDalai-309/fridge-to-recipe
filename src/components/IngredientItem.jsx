@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { swapIngredient } from "../lib/api";
 import { validateSwap } from "../lib/validateRecipe";
 
@@ -23,15 +23,20 @@ export default function IngredientItem({ ingredient, defaultServings, currentSer
 
       if (!result) {
         setSwapStatus("error");
-        setSwapError("Couldn't find an alternative.");
+        setSwapError("no-alternative");
         return;
       }
 
       setSwapped(result);
       setSwapStatus("done");
-    } catch {
+    } catch (err) {
       setSwapStatus("error");
-      setSwapError("Couldn't find an alternative.");
+      // Detect rate-limit sentinel from backend
+      if (err?.message === "rate-limit") {
+        setSwapError("rate-limit");
+      } else {
+        setSwapError("no-alternative");
+      }
     }
   }
 
@@ -43,6 +48,12 @@ export default function IngredientItem({ ingredient, defaultServings, currentSer
 
   const displayName = swapStatus === "done" && swapped ? swapped.alternative : ingredient.name;
   const isSwapped = swapStatus === "done" && Boolean(swapped);
+
+  // Human-readable error text based on error type
+  const swapErrorText =
+    swapError === "rate-limit"
+      ? "Too many requests — wait 15s and retry."
+      : "No substitute found.";
 
   return (
     <li className={`ingredient-item${isSwapped ? " ingredient-item--swapped" : ""}`}>
@@ -61,7 +72,7 @@ export default function IngredientItem({ ingredient, defaultServings, currentSer
           type="button"
           aria-label={`Find substitute for ${ingredient.name}`}
         >
-          Swap
+          <span aria-hidden="true">&#8652;</span> Swap
         </button>
       )}
 
@@ -84,7 +95,7 @@ export default function IngredientItem({ ingredient, defaultServings, currentSer
 
       {swapStatus === "error" && (
         <span className="swap-error" role="alert">
-          {swapError}
+          {swapErrorText}
           <button
             className="swap-btn swap-btn--retry"
             onClick={handleSwap}

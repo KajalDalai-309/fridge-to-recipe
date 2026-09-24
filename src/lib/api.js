@@ -1,6 +1,6 @@
-// All LLM API calls go through this file only.
+﻿// All LLM API calls go through this file only.
 // Components never call the LLM directly.
-// The actual API key is on the server — this only calls /api/generate.
+// The actual API key is on the server - this only calls /api/generate.
 
 import { MOCK_RECIPE_JSON, getMockSwap } from "./mockData";
 
@@ -32,6 +32,7 @@ async function callGenerate(body) {
       } catch {
         // ignore JSON parse failure on error response
       }
+      // Preserve the rate-limit sentinel so callers can show a specific message
       throw new Error(message);
     }
 

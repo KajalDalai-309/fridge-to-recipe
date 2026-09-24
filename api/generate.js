@@ -1,5 +1,5 @@
 ﻿// Vercel Serverless Function
-// This file runs on Vercel's edge — it is the production equivalent of server/index.js
+// This file runs on Vercel's edge - it is the production equivalent of server/index.js
 // The LLM API key lives here, never in the browser.
 
 export default async function handler(req, res) {
@@ -49,6 +49,10 @@ export default async function handler(req, res) {
     if (!response.ok) {
       const errorBody = await response.text();
       console.error("Groq API error:", response.status, errorBody);
+      // Pass rate-limit signal to frontend for a specific user-facing message
+      if (response.status === 429) {
+        return res.status(429).json({ error: "rate-limit" });
+      }
       return res.status(502).json({ error: "LLM provider error. Please try again." });
     }
 
